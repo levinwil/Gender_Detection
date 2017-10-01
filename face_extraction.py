@@ -22,9 +22,9 @@ def extract_faces():
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, 1.3, 5)
         for (x,y,w,h) in faces:
-            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
             image = frame[max(0, y - 40): min(frame.shape[0], y+h + 40), max(0, x - 40):min(frame.shape[1], x+w + 40)]
             cv2.imwrite('data/test/test/face.png', image)
+            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
             face_detected = True
         if face_detected:
             gender = model_predict(model, image)

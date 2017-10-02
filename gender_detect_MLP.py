@@ -108,7 +108,10 @@ class Image_MLP(object):
         batch_size * int(len(train_labels) / batch_size)])
         nb_train_samples = len(train_labels)
 
-        datagen = ImageDataGenerator(rescale=1. / 255)
+        datagen = ImageDataGenerator(rescale=1. / 255,
+                                     shear_range=0.2,
+                                     zoom_range=0.2,
+                                     horizontal_flip=True)
 
         # build the VGG16 network
         model = applications.VGG16(include_top=False,
@@ -211,8 +214,6 @@ class Image_MLP(object):
         plot_model_history(model_info)
         # compute test accuracy
         self.model = model
-        self.evaluate(validation_data_dir,
-                      batch_size)
 
 
     '''
@@ -249,8 +250,7 @@ class Image_MLP(object):
             batch_size * int(len(validation_labels) / batch_size)])
             nb_validation_samples = len(validation_labels)
 
-            predicted_class = self.predict(validation_data_dir,
-                                           batch_size)
+            predicted_class = self.predict(validation_data_dir)
             true_class = np.argmax(validation_labels,
                                    axis=1)
             num_correct = np.sum(predicted_class == true_class)
@@ -278,8 +278,7 @@ class Image_MLP(object):
         discrete values (either a 0 or a 1 at each time point)
     '''
     def predict(self,
-                test_data_dir="./data/test",
-                batch_size = 1):
+                test_data_dir="./data/test"):
         if self.model == None:
             raise ValueError("Please fit model or load model before prediction")
         else:
@@ -287,17 +286,20 @@ class Image_MLP(object):
 
             m = applications.VGG16(include_top=False,
                                    weights='imagenet')
-            datagen = ImageDataGenerator(rescale=1. / 255)
+            datagen = ImageDataGenerator(rescale=1. / 255,
+                                         shear_range=0.2,
+                                         zoom_range=0.2,
+                                         horizontal_flip=True)
             generator = datagen.flow_from_directory(
                 test_data_dir,
                 target_size=(self.img_width, self.img_height),
-                batch_size=batch_size,
+                batch_size=1,
                 class_mode=None,
                 shuffle=False)
             filenames = generator.filenames
             test_data = m.predict_generator(
                 generator,
-                nb_test_samples / batch_size)
+                nb_test_samples)
             result = self.model.predict(test_data)
             predicted_class = np.argmax(result,
                                         axis=1)
@@ -331,7 +333,7 @@ if __name__ == "__main__":
     mlp = Image_MLP(img_width = 640, img_height = 480)
     if args.fit:
         #fit it to the data
-        mlp.fit(batch_size = 1, epochs = 5)
+        mlp.fit(batch_size = 19, epochs = 25)
         #save the fitted model
         mlp.save_model(save_path = 'saved_models/' + args.model_name)
     if args.evaluate:

@@ -4,7 +4,7 @@ from gender_detect_MLP import *
 
 def model_predict(model, img):
     prediction = model.predict()
-    if prediction == 0:
+    if prediction == 1:
         return "MALE"
     else:
         return "FEMALE"

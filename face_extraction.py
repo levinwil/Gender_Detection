@@ -29,7 +29,6 @@ def extract_faces():
         if face_detected:
             gender = model_predict(model, image)
             cv2.putText(image, gender, (image.shape[1]/5, image.shape[0]/5), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
-            cv2.imshow("Prediction", image)
         cv2.imshow('img', frame)
         k = cv2.waitKey(30) & 0xff
         if k == 27:
